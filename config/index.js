@@ -20,6 +20,10 @@ config.redis.host = process.env.REDIS_HOST || (process.env.DOCKER ? 'redis' : 'l
 config.redis.port = process.env.REDIS_PORT || 6379;
 config.redis.password = process.env.REDIS_PASSWORD || '';
 
+config.redis.host = require('../start.js').getConfig().redis.host;
+config.redis.port = require('../start.js').getConfig().redis.port;
+config.redis.password = require('../start.js').getConfig().redis.password;
+
 // SCRAPER INTERVALS
 config.interval = process.env.INTERVAL || 6e5;
 // eslint-disable-next-line camelcase
