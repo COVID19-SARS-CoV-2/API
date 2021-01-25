@@ -24,15 +24,12 @@ const setConfig = (passedConfig) => {
 const execAll = async (redis, keys, scraper) => {
     await Promise.all([
         scraper.getWorldometerPage(keys, redis),
-        scraper.getStates(keys, redis),
         scraper.jhuLocations.jhudataV2(keys, redis),
         scraper.historical.historicalV2(keys, redis),
         scraper.historical.getHistoricalUSADataV2(keys, redis)
     ]);
     logger.info('Finished scraping!');
 };
-
-const execNyt = (redis, keys, scraper) => scraper.nytData(keys, redis);
 
 const startFetch = () => {
     const { redis, keys, scraper } = require('./routes/instances');
@@ -46,17 +43,11 @@ const startFetch = () => {
     }
 
     execAll(redis, keys, scraper).then(() => {});
-    execNyt(redis, keys, scraper).then(() => {});
 
     // Update Worldometer and Johns Hopkins data every 10 minutes
     new CronJob(config.interval, () => {
         logger.info("*** Worldometer JHU Tick ***");
         execAll(redis, keys, scraper).then(() => {});
-    }).start();
-    // Update NYT data every hour
-    new CronJob(config.nyt_interval, () => {
-        logger.info("*** NYT Tick ***");
-        execNyt(redis, keys, scraper).then(() => {});
     }).start();
 }
 
